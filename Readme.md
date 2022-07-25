@@ -1,38 +1,27 @@
-# RÉSEAU SOCIAL INTERNE GROUPOMANIA
+# RÉSEAU SOCIAL POUR GROUPOMANIA
 
-## Backend
+## Installation du backend
 
 ```bash
 npm install
-npm start
+npm run start
 ```
 
-## Frontend
+## Installation du frontend
 
 ```bash
 npm install
 npm run serve
 ```
 
-***Pour tester les fonctionnalités de l'app merci de suivre les étapes suivantes:***
+## Créer les variables d'environnement
 
-- Créez un fichier nommé *.env* dans le dossier backend
+- créer le fichier `.env` dans `./config`
 
-> back
->> app.js\
->> **.env**\
->> server.js
+PORT="Le port utilisé pour se connecter au backend"
+CLIENT_URL="L'url utilisé pour se connecter avec le frontend"
 
-Y insérer directement ces 3 variables d'environnements:
-PORT=5000
-DB_HOST=localhost
-DB_USER=votre_user_name_root
-DB_PASSWORD=votre_mot_de_passe_root
-DB_NAME=groupomania
-SECRET_KEY=Une_clé_secrète_aléatoire
+DB_USER="Votre nom d'utilisateur MongoDB"
+DB_PW="Votre mot de passe MongoDB"
 
-- Puis créez la base de donnée avec le fichier *createDatabse.sql*
-
-```bash
-SOURCE yourPath/createDatabase.sql;
-```
+SECRET_KEY="La clé de création du token : Mettez ce que vous voulez"
