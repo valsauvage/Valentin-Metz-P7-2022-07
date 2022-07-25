@@ -1,13 +1,10 @@
-// MODULES
-const mysql = require('mysql');
+const mongoose = require('mongoose');
 require('dotenv').config();
-// FIN MODULES
 
-// CONNEXION BASE DE DONNEE
-exports.connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
-// FIN CONNEXION 
+mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PW}@cluster0.nkbif.mongodb.net/?retryWrites=true&w=majority`,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+    .then(() => console.log('connecté à MongoDb'))
+    .catch((err) => console.log('connecxion à MongoDb échouée', err));

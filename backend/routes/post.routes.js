@@ -1,24 +1,20 @@
-// MODULES
-const express = require("express");
-const router = express.Router();
-// FIN MODULES
+const router = require('express').Router();
+const postController = require('../controllers/post.controller');
+const multer = require('multer');
+const upload = multer();
 
-// IMPORTATION CONTROLLERS
-const postCtrl = require("../controllers/post.controller");
-// FIN IMPORTATION
+router.get('/', postController.readPost);
+router.post('/', upload.single('file'), postController.createPost);
+router.put('/:id', postController.updatePost);
+router.delete('/:id', postController.deletePost);
+router.patch('/like/:id', postController.likePost);
+router.patch('/unlike/:id', postController.unLikePost);
+router.patch('/dislike/:id', postController.dislikePost);
+router.patch('/undislike/:id', postController.unDislikePost);
 
-// IMPORTATION MIDDLEWARES
-const auth = require("../middleware/auth"); // Crée un token d'identification
-const multer = require("../middleware/multer-config"); // Permet d'envoyer un fichier dans la requête
-// FIN IMPORTATION
-
-// ROUTES
-router.get("/", auth, postCtrl.getAllPosts);
-router.get("/:id", auth, postCtrl.getOnePost);
-router.post("/", auth, multer, postCtrl.createPost);
-router.delete("/:id", auth, postCtrl.deletePost);
-router.post("/:id/comment", auth, postCtrl.createComment);
-router.post("/:id/reaction", auth, postCtrl.reactPost);
-// FIN ROUTES
+// commentaires
+router.patch('/comment/:id', postController.commentPost);
+router.patch('/edit-comment/:id', postController.editCommentPost);
+router.patch('/delete-comment/:id', postController.deleteCommentPost);
 
 module.exports = router;

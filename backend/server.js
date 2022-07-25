@@ -1,59 +1,39 @@
-// MODULES
-const http = require('http');
-const app = require('./app');
-require('dotenv').config();
-//FIN MODULES
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const userRoutes = require('./routes/user.routes');
+const postRoutes = require('./routes/post.routes');
+require('dotenv').config({path: './config/.env'});
+require('./config/db');
+const {checkUser, requireAuth} = require('./middleware/auth.middleware');
+const cors = require('cors');
 
-// FONCTION NORMALIZEPORT
-const normalizePort = val => { // Renvoie un port valide
-  const port = parseInt(val, 10);
+const app = express();
 
-  if (isNaN(port)) {
-    return val
-  }
-  if (port >= 0) {
-    return port;
-  }
-  return false;
-};
-//FIN FONCTION
+const corsOptions = {
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+    'allowedHeaders': ['sessionId', 'Content-Type'],
+    'exposedHeaders': ['sessionId'],
+    'methods': 'GET, HEAD, PUT, PATCH, POST, DELETE',
+    'preflightContinue': false
+}
 
-// DEFINITION DU PORT
-const port = normalizePort(process.env.PORT);
-app.set('port', port);
-// FIN DEFINITION
+app.use(cors(corsOptions));
 
-// FONCTION ERRORHANDLER
-const errorHandler = error => { // Gère les erreurs
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
-  const address = server.address();
-  const bind = typeof address === 'string' ? 'pipe ' + address : 'port: ' + port;
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges.');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use.');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-};
-// FIN FONCTION
+app.use(express.json());
+app.use(cookieParser());
 
-// CREATION SERVEUR
-const server = http.createServer(app);
-
-server.on('error', errorHandler); // Gère les erreurs
-server.on('listening', () => { // Consigne le port ou canal dans la console
-  const address = server.address();
-  const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
-  console.log('Listening on ' + bind);
+//jwt
+app.get('*', checkUser);
+app.get('/jwtid', requireAuth, (req, res) => {
+res.status(200).send(res.locals.user._id)
 });
 
-server.listen(port);
-// FIN CREATION
+// routes
+app.use('/api/user', userRoutes);
+app.use('/api/post', postRoutes);
+
+// server
+app.listen(process.env.PORT, () => {
+    console.log(`listening on port ${process.env.PORT}`);
+});

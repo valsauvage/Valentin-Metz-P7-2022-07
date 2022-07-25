@@ -1,23 +1,23 @@
-// MODULES
-const express = require("express");
-const router = express.Router();
-// FIN MODULES
+const router = require('express').Router();
+const { Router } = require('express');
+const authController = require('../controllers/auth.controller');
+const userController = require('../controllers/user.controller');
+const uploadController = require('../controllers/upload.controller');
+const multer = require('multer');
+const upload = multer();
 
-// IMPORTATION USER CONTROLLERS
-const userCtrl = require("../controllers/user.controller");
-// FIN IMPORTATION
+// authentification
+router.post('/register', authController.signUp);
+router.post('/login', authController.signIn);
+router.get('/logout', authController.logout);
 
-// IMPORTATION MIDDLEWARES
-const auth = require("../middleware/auth"); // Crée un token d'identification
-const multer = require("../middleware/multer-config"); // Permet d'envoyer un fichier dans la requête
-// FIN IMPORTATION
+// user.db
+router.get('/', userController.getAllUsers);
+router.get('/:id', userController.userInfo);
+router.put('/:id', userController.updateUser);
+router.delete('/:id', userController.deleteUser);
 
-// ROUTE
-router.post("/signup", userCtrl.signup);
-router.post("/login", userCtrl.login);
-router.delete("/delete", auth, userCtrl.delete);
-router.get("/:id/profile", auth, userCtrl.profile);
-router.put("/modify", auth, multer, userCtrl.modify);
-// ROUTE
+// upload
+router.post('/upload', upload.single('file'), uploadController.uploadProfile)
 
 module.exports = router;
