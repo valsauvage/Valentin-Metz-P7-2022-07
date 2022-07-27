@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { addComment, getPosts } from "../../actions/post.actions";
 import { isEmpty, timeStampParser } from "../Utils";
+import EditDeleteComment from "./EditDeleteComment";
 
 function CardComments({ post }) {
   const [text, setText] = useState("");
@@ -12,7 +14,9 @@ function CardComments({ post }) {
     e.preventDefault();
 
     if (text) {
-      
+      dispatch(addComment(post._id, userData._id, text, userData.pseudo))
+        .then(() => dispatch(getPosts()))
+        .then(() => setText(""));
     }
   };
 
@@ -50,6 +54,7 @@ function CardComments({ post }) {
                 <span>{timeStampParser(comment.timestamp)}</span>
               </div>
               <p>{comment.text}</p>
+              <EditDeleteComment comment={comment} postId={post._id} />
             </div>
           </div>
         );
