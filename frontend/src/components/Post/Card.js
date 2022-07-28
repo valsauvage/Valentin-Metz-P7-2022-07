@@ -85,7 +85,7 @@ function Card({ post }) {
                 <div onClick={() => setIsUpdated(!isUpdated)}>
                   <img src="./img/icons/edit.svg" alt="éditer" />
                 </div>
-                <DeleteCard id={post.id} />
+                <DeleteCard id={post._id} />
               </div>
             )}
             <div className="card-footer">

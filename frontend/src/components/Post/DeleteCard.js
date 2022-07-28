@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { deletePost } from "../../actions/post.actions";
 
-function DeleteCard({props}) {
+function DeleteCard(props) {
   const dispatch = useDispatch();
 
   const deleteQuote = () => dispatch(deletePost(props.id));

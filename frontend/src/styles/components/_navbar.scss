@@ -42,7 +42,7 @@ nav {
         font-family: $font-3;
       }
       img {
-        height: 3.5rem;
+        height: 3rem;
         // width: 26px;
       }
     }
@@ -50,13 +50,12 @@ nav {
     ul {
       display: flex;
       align-items: center;
-      justify-content: center;
       width: 35%;
       justify-content: space-between;
       font-size: 1.2rem;
       
       .welcome {
-        transform: translateY(2px);
+        transform: translateY(4px);
 
         @media screen and(max-width: 590px) {
           display: none;
@@ -64,19 +63,16 @@ nav {
         
         h5 {
           font-family: $font-3;
+          margin-bottom: 8px;
         }
       }
       
       li {
         
         img {
-          height: 24px;
-          width: 24px;
+          width: 80%;
+          height: 80%;
           cursor: pointer;
-          display: grid;
-          align-items: center;
-          justify-items: center;
-          height: 100%;
         }
       }
     }

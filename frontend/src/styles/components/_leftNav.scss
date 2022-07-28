@@ -1,21 +1,18 @@
 .left-nav-container {
-  position: relative;
 
   .icons {
-    position: fixed;
-    z-index: 10;
 
     @media screen and(max-width: 590px) {
       margin: 2px 0 0 -9px;
     }
 
     .icons-bis {
-      position: absolute;
-      left: 10px;
+      display: flex;
 
       a {
         transition: 0.1s;
         display: inline-block;
+        margin-right: 1rem;
 
         &:before {
           transition: .15s ease;
@@ -43,6 +40,7 @@
         }
 
         img {
+
           @media screen and(max-width: 590px) {
             height: 34px;
             width: 34px;
@@ -55,19 +53,19 @@
 
         &::after {
           content: "";
-          height: 40px;
-          width: 5px;
+          height: 2px;
+          width: 40px;
           position: absolute;
           background: $color-1;
-          left: -7px;
-          bottom: 8px;
+          left: 0;
+          bottom: -2px;
           border-radius: 40px;
-          transform: scaleY(0);
+          transform: scaleX(0);
           animation: scale 1.5s ease forwards;
 
           @keyframes scale {
             to {
-              transform: scaleY(1);
+              transform: scaleX(1);
             }
           }
           @media screen and(max-width: 590px) {

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import LeftNav from "../LeftNav";
 import { useDispatch, useSelector } from "react-redux";
 import UploadImg from "./UploadImg";
 import { updateBio } from "../../actions/user.actions";
@@ -17,7 +16,6 @@ function UpdateProfil() {
 
   return (
     <div className="profil-container">
-      <LeftNav />
       <h1> Profil de {userData.pseudo}</h1>
       <div className="update-container">
         <div className="left-part">

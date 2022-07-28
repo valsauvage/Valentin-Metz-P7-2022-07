@@ -1,7 +1,7 @@
 const postModel = require("../models/post.model");
 const userModel = require("../models/user.model");
 const { post } = require("../routes/user.routes");
-const objectId = require("mongoose").Types.ObjectId;
+const ObjectID = require("mongoose").Types.ObjectID;
 const fs = require("fs");
 const { promisify } = require("util");
 const pipeline = promisify(require("stream").pipeline);
@@ -59,7 +59,7 @@ module.exports.createPost = async (req, res) => {
 };
 
 module.exports.updatePost = (req, res) => {
-  if (!objectId.isValid(req.params.id))
+  if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   const updatedRecord = {
@@ -77,7 +77,7 @@ module.exports.updatePost = (req, res) => {
 };
 
 module.exports.deletePost = (req, res) => {
-  if (!objectId.isValid(req.params.id))
+  if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   postModel.findByIdAndDelete(req.params.id, (err, docs) => {
@@ -87,7 +87,7 @@ module.exports.deletePost = (req, res) => {
 };
 
 module.exports.likePost = async (req, res) => {
-  if (!objectId.isValid(req.params.id))
+  if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
@@ -120,7 +120,7 @@ module.exports.likePost = async (req, res) => {
 };
 
 module.exports.unLikePost = async (req, res) => {
-  if (!objectId.isValid(req.params.id))
+  if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
@@ -153,7 +153,7 @@ module.exports.unLikePost = async (req, res) => {
 };
 
 module.exports.dislikePost = async (req, res) => {
-  if (!objectId.isValid(req.params.id))
+  if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
@@ -186,7 +186,7 @@ module.exports.dislikePost = async (req, res) => {
 };
 
 module.exports.unDislikePost = async (req, res) => {
-  if (!objectId.isValid(req.params.id))
+  if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
@@ -219,7 +219,7 @@ module.exports.unDislikePost = async (req, res) => {
 };
 
 module.exports.commentPost = (req, res) => {
-  if (!objectId.isValid(req.params.id))
+  if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
@@ -247,7 +247,7 @@ module.exports.commentPost = (req, res) => {
 };
 
 module.exports.editCommentPost = (req, res) => {
-  if (!objectId.isValid(req.params.id))
+  if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {

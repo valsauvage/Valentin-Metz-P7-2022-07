@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { addPost, getPosts } from "../../actions/post.actions";
 import { isEmpty, timeStampParser } from "../Utils";
 
 function NewPostForm() {
@@ -9,8 +10,22 @@ function NewPostForm() {
   const [postPicture, setPostPicture] = useState(null);
   const [file, setFile] = useState("");
   const userData = useSelector((state) => state.userReducer);
-  
-  const handlePost = () => {};
+  const dispatch = useDispatch();
+
+  const handlePost = async () => {
+    if (message || postPicture) {
+      const data = new FormData();
+      data.append("posterId", userData._id);
+      data.append("message", message);
+      if (file) data.append("file", file);
+
+      await dispatch(addPost(data));
+      dispatch(getPosts());
+      cancelPost();
+    } else {
+      alert("Veuillez écrire quelque chose");
+    }
+  };
 
   const handlePicture = (e) => {
     setPostPicture(URL.createObjectURL(e.target.files[0]));
