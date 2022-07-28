@@ -1,4 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { deleteComment, editComment } from "../../actions/post.actions";
 import { UidContext } from "../AppContext";
 
 function EditDeleteComment({ comment, postId }) {
@@ -6,8 +8,19 @@ function EditDeleteComment({ comment, postId }) {
   const [edit, setEdit] = useState(false);
   const [text, setText] = useState("");
   const uid = useContext(UidContext);
+  const dispatch = useDispatch();
 
-  const handleEdit = (e) => {};
+  const handleEdit = (e) => {
+    e.preventDefault();
+
+    if (text) {
+      dispatch(editComment(postId, comment._id, text));
+      setText("");
+      setEdit(false);
+    }
+  };
+
+  const handelDelete = () => dispatch(deleteComment(postId, comment._id));
 
   useEffect(() => {
     const checkAuthor = () => {
@@ -36,7 +49,22 @@ function EditDeleteComment({ comment, postId }) {
             onChange={(e) => setText(e.target.value)}
             defaultValue={comment.text}
           />
-          <input type="submit" value="Valider le commentaire" />
+          <div className="btn">
+            <span
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Êtes-vous sur de vouloir supprimer ce commentaire ?"
+                  )
+                ) {
+                  handelDelete();
+                }
+              }}
+            >
+              <img src="./img/icons/trash.svg" alt="Suppression" />
+            </span>
+            <input type="submit" value="Valider le commentaire" />
+          </div>
         </form>
       )}
     </div>

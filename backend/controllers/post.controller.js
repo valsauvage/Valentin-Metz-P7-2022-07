@@ -259,7 +259,7 @@ module.exports.editCommentPost = (req, res) => {
       theComment.text = req.body.text;
       return docs.save((err) => {
         if (!err) res.status(200).send(docs);
-        return res.status(500).send(err);
+        // return res.status(500).send(err);
       });
     });
   } catch (err) {
