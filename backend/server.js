@@ -1,39 +1,53 @@
-const express = require("express");
-const cookieParser = require("cookie-parser");
-const userRoutes = require("./routes/user.routes");
-const postRoutes = require("./routes/post.routes");
 require("dotenv").config({ path: "./config/.env" });
 require("./config/db");
-const { checkUser, requireAuth } = require("./middleware/auth.middleware");
-const cors = require("cors");
+const http = require("http");
+const app = require("./app");
 
-const app = express();
+// Fonction qui renvoie un port valide, qu'il soit de type string ou number
+const normalizePort = (val) => {
+  const port = parseInt(val, 10);
 
-const corsOptions = {
-  origin: process.env.CLIENT_URL,
-  credentials: true,
-  allowedHeaders: ["sessionId", "Content-Type"],
-  exposedHeaders: ["sessionId"],
-  methods: "GET, HEAD, PUT, PATCH, POST, DELETE",
-  preflightContinue: false,
+  if (isNaN(port)) {
+    return val;
+  }
+  if (port >= 0) {
+    return port;
+  }
+  return false;
+};
+const port = normalizePort(process.env.PORT || "4200");
+app.set("port", port);
+
+// Cette fonction gère les erreurs et les enregistre dans le serveur
+const errorHandler = (error) => {
+  if (error.syscall !== "listen") {
+    throw error;
+  }
+  const address = server.address();
+  const bind =
+    typeof address === "string" ? "pipe " + address : "port: " + port;
+  switch (error.code) {
+    case "EACCES":
+      console.error(bind + " requires elevated privileges.");
+      process.exit(1);
+      break;
+    case "EADDRINUSE":
+      console.error(bind + " is already in use.");
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
 };
 
-app.use(cors(corsOptions));
+const server = http.createServer(app);
 
-app.use(express.json());
-app.use(cookieParser());
-
-//jwt
-app.get("*", checkUser);
-app.get("/jwtid", requireAuth, (req, res) => {
-  res.status(200).send(res.locals.user._id);
+// Cette commande permet de consigner le port d'écoute du serveur dans la console
+server.on("error", errorHandler);
+server.on("listening", () => {
+  const address = server.address();
+  const bind = typeof address === "string" ? "pipe " + address : "port " + port;
+  console.log("Listening on " + bind);
 });
 
-// routes
-app.use("/api/user", userRoutes);
-app.use("/api/post", postRoutes);
-
-// server
-app.listen(process.env.PORT, () => {
-  console.log(`listening on port ${process.env.PORT}`);
-});
+server.listen(port);

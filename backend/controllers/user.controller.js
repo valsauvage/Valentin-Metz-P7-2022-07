@@ -28,11 +28,13 @@ module.exports.updateUser = async (req, res) => {
           bio: req.body.bio,
         },
       },
-      { new: true, upsert: true, setDefaultsOnInsert: true },
-      (err, docs) => {
-        if (!err) return res.send(docs);
-        if (err) return res.status(500).send({ message: err });
-      }
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+        .then((docs) => {
+          return res.send(docs);
+        })
+        .catch((err) => {
+          return res.status(500).send(err);
+        })
     );
   } catch (err) {
     return res.status(500).json({ message: err });

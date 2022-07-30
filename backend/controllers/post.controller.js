@@ -1,10 +1,11 @@
 const postModel = require("../models/post.model");
 const userModel = require("../models/user.model");
 const { post } = require("../routes/user.routes");
-const ObjectID = require("mongoose").Types.ObjectID;
-const fs = require("fs");
-const { promisify } = require("util");
-const pipeline = promisify(require("stream").pipeline);
+const ObjectId = require("mongoose").Types.ObjectId;
+// const fs = require("fs");
+// const { promisify } = require("util");
+const { uploadErrors } = require("../utils/errors.utils");
+// const pipeline = promisify(require("stream").pipeline);
 
 module.exports.readPost = (req, res) => {
   postModel
@@ -16,40 +17,44 @@ module.exports.readPost = (req, res) => {
 };
 
 module.exports.createPost = async (req, res) => {
-  let fileName;
-  if (req.file !== null) {
-    try {
-      if (
-        req.file.detectedMimeType != "image/jpg" &&
-        req.file.detectedMimeType != "image/png" &&
-        req.file.detectedMimeType != "image/jpeg"
-      )
-        throw Error("Invalid file");
-      if (req.file.size > 500000) throw Error("Max size");
-    } catch (err) {
-      const errors = uploadErrors(err);
-      return res.status(201).json(errors);
-    }
 
-    fileName = req.body.posterId + Date.now() + ".jpg";
+  
+  // let fileName;
+  // console.log(req.file);
+  // if (req.file !== undefined) {
+  
+  //   try {
+  //     if (
+  //       req.file.mimetype != "image/jpg" &&
+  //       req.file.mimetype != "image/png" &&
+  //       req.file.mimetype != "image/jpeg"
+  //     )
+  //       throw Error("Invalid file");
+  //     if (req.file.size > 500000) throw Error("Max size");
+  //   } catch (err) {
+  //     const errors = uploadErrors(err);
+  //     return res.status(500).json({errors});
+  //   }
 
-    await pipeline(
-      req.file.stream,
-      fs.createWriteStream(
-        `${__dirname}/../client/public/uploads/posts/${fileName}`
-      )
-    );
-  }
+  //   fileName = req.body.posterId + Date.now() + ".jpg";
+
+  //   await pipeline(
+  //     req.file.buffer,
+  //     fs.createWriteStream(
+  //       `${__dirname}/../client/public/uploads/posts/${fileName}`
+  //     )
+  //   );
+  // }
 
   const newPost = new postModel({
     posterId: req.body.posterId,
     message: req.body.message,
-    picture: req.file !== null ? "./uploads/posts/" + fileName : "",
+    picture: req.file !== undefined ? `${req.protocol}://${req.get("host")}/upload/${req.file.filename}` : "",
     likes: [],
-    disLikes: [],
+    // disLikes: [],
     comments: [],
   });
-
+  console.log('newPost', newPost)
   try {
     const post = await newPost.save();
     return res.status(201).json(post);
@@ -59,7 +64,7 @@ module.exports.createPost = async (req, res) => {
 };
 
 module.exports.updatePost = (req, res) => {
-  if (!ObjectID.isValid(req.params.id))
+  if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   const updatedRecord = {
@@ -77,7 +82,7 @@ module.exports.updatePost = (req, res) => {
 };
 
 module.exports.deletePost = (req, res) => {
-  if (!ObjectID.isValid(req.params.id))
+  if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   postModel.findByIdAndDelete(req.params.id, (err, docs) => {
@@ -87,7 +92,7 @@ module.exports.deletePost = (req, res) => {
 };
 
 module.exports.likePost = async (req, res) => {
-  if (!ObjectID.isValid(req.params.id))
+  if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
@@ -96,11 +101,7 @@ module.exports.likePost = async (req, res) => {
       {
         $addToSet: { likers: req.body.id },
       },
-      { new: true },
-      (err, docs) => {
-        if (err) return res.status(200).send(err);
-      }
-    );
+      { new: true }).catch((err) => {return res.status(400).send({message1: err})});
     await userModel.findByIdAndUpdate(
       req.body.id,
       {
@@ -108,19 +109,18 @@ module.exports.likePost = async (req, res) => {
           likes: req.params.id,
         },
       },
-      { new: true },
-      (err, docs) => {
-        if (!err) res.send(docs);
-        else return res.status(400).send(err);
+      { new: true }).then(
+      (docs) => {
+       return res.send(docs);
       }
-    );
+    ).catch((err) => {return res.status(400).send({message1: err})})
   } catch (err) {
-    return res.status(400).send(err);
+    return res.status(400).send({message2: err});
   }
 };
 
 module.exports.unLikePost = async (req, res) => {
-  if (!ObjectID.isValid(req.params.id))
+  if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
@@ -129,10 +129,7 @@ module.exports.unLikePost = async (req, res) => {
       {
         $pull: { likers: req.body.id },
       },
-      { new: true },
-      (err, docs) => {
-        if (err) return res.status(200).send(err);
-      }
+      { new: true }.catch((err) => {return res.status(400).send(err)})
     );
     await userModel.findByIdAndUpdate(
       req.body.id,
@@ -141,85 +138,85 @@ module.exports.unLikePost = async (req, res) => {
           likes: req.params.id,
         },
       },
-      { new: true },
-      (err, docs) => {
-        if (!err) res.send(docs);
-        else return res.status(400).send(err);
-      }
+      { new: true }.then(
+        (docs) => {
+         return res.send(docs);
+        }
+      ).catch((err) => {return res.status(400).send(err)})
     );
   } catch (err) {
     return res.status(400).send(err);
   }
 };
 
-module.exports.dislikePost = async (req, res) => {
-  if (!ObjectID.isValid(req.params.id))
-    return res.status(400).send("ID unknown : " + req.params.id);
+// module.exports.dislikePost = async (req, res) => {
+//   if (!ObjectId.isValid(req.params.id))
+//     return res.status(400).send("ID unknown : " + req.params.id);
 
-  try {
-    await postModel.findByIdAndUpdate(
-      req.params.id,
-      {
-        $addToSet: { disLikers: req.body.id },
-      },
-      { new: true },
-      (err, docs) => {
-        if (err) return res.status(200).send(err);
-      }
-    );
-    await userModel.findByIdAndUpdate(
-      req.body.id,
-      {
-        $addToSet: {
-          disLikes: req.params.id,
-        },
-      },
-      { new: true },
-      (err, docs) => {
-        if (!err) res.send(docs);
-        else return res.status(400).send(err);
-      }
-    );
-  } catch (err) {
-    return res.status(400).send(err);
-  }
-};
+//   try {
+//     await postModel.findByIdAndUpdate(
+//       req.params.id,
+//       {
+//         $addToSet: { disLikers: req.body.id },
+//       },
+//       { new: true },
+//       (err, docs) => {
+//         if (err) return res.status(200).send(err);
+//       }
+//     );
+//     await userModel.findByIdAndUpdate(
+//       req.body.id,
+//       {
+//         $addToSet: {
+//           disLikes: req.params.id,
+//         },
+//       },
+//       { new: true },
+//       (err, docs) => {
+//         if (!err) res.send(docs);
+//         else return res.status(400).send(err);
+//       }
+//     );
+//   } catch (err) {
+//     return res.status(400).send(err);
+//   }
+// };
 
-module.exports.unDislikePost = async (req, res) => {
-  if (!ObjectID.isValid(req.params.id))
-    return res.status(400).send("ID unknown : " + req.params.id);
+// module.exports.unDislikePost = async (req, res) => {
+//   if (!ObjectId.isValid(req.params.id))
+//     return res.status(400).send("ID unknown : " + req.params.id);
 
-  try {
-    await postModel.findByIdAndUpdate(
-      req.params.id,
-      {
-        $pull: { disLikers: req.body.id },
-      },
-      { new: true },
-      (err, docs) => {
-        if (err) return res.status(200).send(err);
-      }
-    );
-    await userModel.findByIdAndUpdate(
-      req.body.id,
-      {
-        $pull: {
-          disLikes: req.params.id,
-        },
-      },
-      { new: true },
-      (err, docs) => {
-        if (!err) res.send(docs);
-        else return res.status(400).send(err);
-      }
-    );
-  } catch (err) {
-    return res.status(400).send(err);
-  }
-};
+//   try {
+//     await postModel.findByIdAndUpdate(
+//       req.params.id,
+//       {
+//         $pull: { disLikers: req.body.id },
+//       },
+//       { new: true },
+//       (err, docs) => {
+//         if (err) return res.status(200).send(err);
+//       }
+//     );
+//     await userModel.findByIdAndUpdate(
+//       req.body.id,
+//       {
+//         $pull: {
+//           disLikes: req.params.id,
+//         },
+//       },
+//       { new: true },
+//       (err, docs) => {
+//         if (!err) res.send(docs);
+//         else return res.status(400).send(err);
+//       }
+//     );
+//   } catch (err) {
+//     return res.status(400).send(err);
+//   }
+// };
 
 module.exports.commentPost = (req, res) => {
-  if (!ObjectID.isValid(req.params.id))
+  if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
@@ -268,7 +265,7 @@ module.exports.editCommentPost = (req, res) => {
 };
 
 module.exports.deleteCommentPost = (req, res) => {
-  if (!objectId.isValid(req.params.id))
+  if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
