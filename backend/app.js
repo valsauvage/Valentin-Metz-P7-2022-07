@@ -1,11 +1,10 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const userRoutes = require("./routes/user.routes");
+const postRoutes = require("./routes/post.routes");
 const { checkUser, requireAuth } = require("./middleware/auth.middleware");
 const cors = require("cors");
 const path = require('path');
-
-const userRoutes = require("./routes/user.routes");
-const postRoutes = require("./routes/post.routes");
 
 const app = express();
 
@@ -24,18 +23,16 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-
-app.use('/upload', express.static(path.join(__dirname, 'upload')));
-
 //jwt
 app.get("*", checkUser);
 app.get("/jwtid", requireAuth, (req, res) => {
   res.status(200).send(res.locals.user._id);
 });
 
-
 // routes
 app.use("/api/user", userRoutes);
 app.use("/api/post", postRoutes);
+
+app.use('/upload', express.static(path.join(__dirname, 'upload')));
 
 module.exports = app;

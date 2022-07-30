@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     },
     picture: {
       type: String,
-      default: "./upload/profil/random-user.png"
+      default: "../upload/profil/random-user.svg"
     },
     bio: {
       type: String,
@@ -37,9 +37,6 @@ const userSchema = new mongoose.Schema(
     likes: {
       type: [String]
     },
-    // disLikes: {
-    //   type: [String]
-    // }
   },
   {
     timestamps: true,

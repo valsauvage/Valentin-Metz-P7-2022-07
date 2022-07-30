@@ -10,6 +10,7 @@ function NewPostForm() {
   const [postPicture, setPostPicture] = useState(null);
   const [file, setFile] = useState("");
   const userData = useSelector((state) => state.userReducer);
+  const error = useSelector((state) => state.errorReducer.postError);
   const dispatch = useDispatch();
 
   const handlePost = async () => {
@@ -40,7 +41,7 @@ function NewPostForm() {
 
   useEffect(() => {
     if (!isEmpty(userData)) setIsLoading(false);
-  }, [userData]);
+  }, [userData, message]);
 
   return (
     <div className="post-container">
@@ -89,6 +90,8 @@ function NewPostForm() {
                   onChange={(e) => handlePicture(e)}
                 />
               </div>
+              {!isEmpty(error.format) && <p>{error.format}</p>}
+              {!isEmpty(error.maxSize) && <p>{error.maxSize}</p>}
               <div className="btn-send">
                 {message || postPicture ? (
                   <button className="cancel" onClick={cancelPost}>
