@@ -1,10 +1,10 @@
-const postModel = require("../models/post.model");
-const userModel = require("../models/user.model");
+const PostModel = require("../models/post.model");
+const UserModel = require("../models/user.model");
 const ObjectId = require("mongoose").Types.ObjectId;
 const { uploadErrors } = require("../utils/errors.utils");
 
 module.exports.readPost = (req, res) => {
-  postModel
+  PostModel
     .find((err, docs) => {
       if (!err) res.send(docs);
       else console.log("Erreur de contenu : " + err);
@@ -14,7 +14,7 @@ module.exports.readPost = (req, res) => {
 
 module.exports.createPost = async (req, res) => {
 
-  const newPost = new postModel({
+  const newPost = new PostModel({
     posterId: req.body.posterId,
     message: req.body.message,
     picture:
@@ -40,7 +40,7 @@ module.exports.updatePost = (req, res) => {
   const updatedRecord = {
     message: req.body.message,
   };
-  postModel.findByIdAndUpdate(
+  PostModel.findByIdAndUpdate(
     req.params.id,
     { $set: updatedRecord },
     { new: true },
@@ -55,7 +55,7 @@ module.exports.deletePost = (req, res) => {
   if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
-  postModel.findByIdAndDelete(req.params.id, (err, docs) => {
+  PostModel.findByIdAndDelete(req.params.id, (err, docs) => {
     if (!err) res.send(docs);
     else console.log("Erreur de suppression : " + err);
   });
@@ -66,7 +66,7 @@ module.exports.likePost = async (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    await postModel
+    await PostModel
       .findByIdAndUpdate(
         req.params.id,
         {
@@ -77,7 +77,7 @@ module.exports.likePost = async (req, res) => {
       .catch((err) => {
         return res.status(400).send(err);
       });
-    await userModel
+    await UserModel
       .findByIdAndUpdate(
         req.body.id,
         {
@@ -103,7 +103,7 @@ module.exports.unLikePost = async (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    await postModel
+    await PostModel
       .findByIdAndUpdate(
         req.params.id,
         {
@@ -114,7 +114,7 @@ module.exports.unLikePost = async (req, res) => {
       .catch((err) => {
         return res.status(400).send(err);
       });
-    await userModel
+    await UserModel
       .findByIdAndUpdate(
         req.body.id,
         {
@@ -140,7 +140,7 @@ module.exports.commentPost = (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    return postModel.findByIdAndUpdate(
+    return PostModel.findByIdAndUpdate(
       req.params.id,
       {
         $push: {
@@ -168,7 +168,7 @@ module.exports.editCommentPost = (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    return postModel.findById(req.params.id, (err, docs) => {
+    return PostModel.findById(req.params.id, (err, docs) => {
       const theComment = docs.comments.find((comment) =>
         comment._id.equals(req.body.commentId)
       );
@@ -189,7 +189,7 @@ module.exports.deleteCommentPost = (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    return postModel.findByIdAndUpdate(
+    return PostModel.findByIdAndUpdate(
       req.params.id,
       {
         $pull: {

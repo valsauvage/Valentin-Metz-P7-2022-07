@@ -25,7 +25,7 @@ export const uploadPicture = (data, id) => {
         if (res.data.errors) {
           dispatch({ type: GET_USER_ERRORS, payload: res.data.errors });
         } else {
-          dispatch({ type: GET_USER_ERRORS, payload: '' });
+          dispatch({ type: GET_USER_ERRORS, payload: "" });
           return axios
             .get(`${process.env.REACT_APP_API_URL}api/user/${id}`)
             .then((res) => {
