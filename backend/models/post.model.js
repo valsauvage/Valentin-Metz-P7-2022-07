@@ -18,10 +18,6 @@ const postSchema = new mongoose.Schema(
       type: [String],
       requires: true,
     },
-    // disLikers: {
-    //   type: [String],
-    //   requires: true,
-    // },
     comments: {
       type: [
         {

@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
     },
     picture: {
       type: String,
-      default: "../upload/profil/random-user.svg"
+      default: `${process.env.SERVER_URL}/upload/profil/random-user.png`
     },
     bio: {
       type: String,
@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema(
     likes: {
       type: [String]
     },
+    admin: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,

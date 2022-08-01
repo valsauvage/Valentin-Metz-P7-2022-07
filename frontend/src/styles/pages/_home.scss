@@ -77,16 +77,34 @@
   }
   .right-side {
     position: relative;
-    width: 100%;
     margin: 0px 0 0 14px;
-
+    
     @media screen and(max-width: 990px) {
       display: none;
     }
-  
+    
     .right-side-container {
       position: fixed;
+      max-width: 374px;
     
     }
+    > div {
+      background: $color-4;
+      border-radius: 20px;
+      padding: 25px;
+      margin: 0px 10px 20px 10px;
+
+      @media screen and(max-width: 700px) {
+        margin: 10px 10px;
+      }
+    }
+
+      img {
+        width: 100%;
+        border-radius: 46px;
+        object-fit: cover;
+        box-shadow: 0 0 6px rgba(51, 51, 51, 0.363);
+      }
+    
   }
 }

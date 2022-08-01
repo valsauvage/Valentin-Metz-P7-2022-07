@@ -70,12 +70,12 @@ function NewPostForm() {
                 <div className="card-right">
                   <div className="card-header">
                     <h3>{userData.pseudo}</h3>
-                  </div>
                   <span>{timeStampParser(Date.now())}</span>
-                </div>
+                  </div>
                 <div className="content">
                   <p>{message}</p>
                   <img src={postPicture} alt="Preview" />
+                </div>
                 </div>
               </li>
             ) : null}

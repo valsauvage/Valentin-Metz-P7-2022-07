@@ -1,10 +1,13 @@
 const multer = require("multer");
+const { uploadErrors } = require("../utils/errors.utils");
 
 // const MIME_TYPES = {
 //   "image/jpg": "jpg",
 //   "image/jpeg": "jpg",
 //   "image/png": "png",
 // };
+
+const maxSize = 500000;
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
@@ -15,14 +18,11 @@ const storage = multer.diskStorage({
       file.mimetype != "image/jpg" &&
       file.mimetype != "image/jpeg" &&
       file.mimetype != "image/png"
-    ) {
-      throw err;
-    } else {
-      // const name = file.originalname.split(' ').join('_');
-      // const extension = MIME_TYPES[file.mimetype];
-      callback(null, file.originalname);
-    }
+    )
+      return Error("invalid file");
+    // if (req.file.size > 500000) return Error("max size");
+    else callback(null, file.originalname);
   },
 });
 
-module.exports = multer({ storage: storage }).single("file");
+module.exports = multer({ storage: storage, limits: { fileSize: maxSize }}).single("file");
