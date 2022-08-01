@@ -80,14 +80,14 @@ function Card({ post }) {
                 className="card-pic"
               />
             )}
-            {(userData._id === post.posterId) && (userData.admin === true) && (
+            {(userData._id === post.posterId) || (userData.admin === true) ? (
               <div className="button-container">
                 <div onClick={() => setIsUpdated(!isUpdated)}>
                   <img src="./img/icons/edit.svg" alt="éditer" />
                 </div>
                 <DeleteCard id={post._id} />
               </div>
-            )}
+            ) : ('')}
             <div className="card-footer">
               <div className="comment-icon">
                 <img

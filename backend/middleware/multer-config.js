@@ -1,13 +1,6 @@
 const multer = require("multer");
-const { uploadErrors } = require("../utils/errors.utils");
 
-// const MIME_TYPES = {
-//   "image/jpg": "jpg",
-//   "image/jpeg": "jpg",
-//   "image/png": "png",
-// };
-
-const maxSize = 500000;
+const maxSize = 1000000;
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
