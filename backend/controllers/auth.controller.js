@@ -1,7 +1,7 @@
 const UserModel = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-// const { signUpErrors, signInErrors } = require("../utils/errors.utils");
+const { signUpErrors, signInErrors } = require("../utils/errors.utils");
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
@@ -21,7 +21,10 @@ module.exports.signUp = async (req, res) => {
     user
       .save()
       .then(() => res.status(201).json({ message: "utilisateur créé" }))
-      .catch((error) => res.status(400).json({ error }));
+      .catch((err) => {
+        const errors = signUpErrors(err);
+        res.status(400).send({ errors });
+      });
   });
 
   // try {
@@ -55,12 +58,12 @@ module.exports.signIn = async (req, res) => {
               });
             }
           })
-          .catch((error) =>
+          .catch((err) =>
             res.status(500).json({ message: "erreur de cryptage " + error })
           );
       }
     })
-    .catch((error) =>
+    .catch((err) =>
       res.status(500).json({ message: "erreur d'email " + error })
     );
 
