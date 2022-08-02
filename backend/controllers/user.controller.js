@@ -29,8 +29,8 @@ module.exports.updateUser = async (req, res) => {
         },
       },
       { new: true, upsert: true, setDefaultsOnInsert: true })
-        .then((docs) => {
-          res.send(docs);
+        .then((data) => {
+          res.send(data);
         })
         .catch((err) => {
           res.status(500).send({ message: err });

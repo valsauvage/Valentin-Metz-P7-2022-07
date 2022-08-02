@@ -13,7 +13,10 @@ module.exports.readPost = (req, res) => {
 };
 
 module.exports.createPost = async (req, res) => {
-
+  if (req.error) {
+    const errors = uploadErrors(req.error);
+    return res.status(201).json({ errors });
+   }
   const newPost = new PostModel({
     posterId: req.body.posterId,
     message: req.body.message,

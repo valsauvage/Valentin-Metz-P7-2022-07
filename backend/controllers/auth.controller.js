@@ -1,7 +1,7 @@
 const UserModel = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { signUpErrors, signInErrors } = require("../utils/errors.utils");
+const { signUpErrors } = require("../utils/errors.utils");
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
@@ -23,7 +23,7 @@ module.exports.signUp = async (req, res) => {
       .then(() => res.status(201).json({ message: "utilisateur créé" }))
       .catch((err) => {
         const errors = signUpErrors(err);
-        res.status(400).send({ errors });
+        res.status(200).send({ errors });
       });
   });
 
@@ -42,13 +42,17 @@ module.exports.signIn = async (req, res) => {
   })
     .then((user) => {
       if (!user) {
-        return res.status(401).json({ error: "Utilisateur inconnu" });
+        return res
+          .status(200)
+          .json({ errors: { email: "Utilisateur inconnu", password: "" } });
       } else {
         bcrypt
           .compare(req.body.password, user.password)
           .then((valid) => {
             if (!valid) {
-              return res.status(401).json({ error: "Mot de pass incorrect" });
+              return res.status(200).json({
+                errors: { email: "", password: "Mot de pass incorrect" },
+              });
             } else {
               const token = createToken(user._id);
               res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge });

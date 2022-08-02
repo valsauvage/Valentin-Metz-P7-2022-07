@@ -11,17 +11,6 @@ nav {
     padding: 0 20px;
   }
 
-  // &::after {
-  //   content: "";
-  //   height: 45px;
-  //   width: 110%;
-  //   left: -20px;
-  //   top:0;
-  //   position: absolute;
-  //   backdrop-filter: blur(3px);
-  //   background: rgba(255, 255, 255, 0.86);
-  //   z-index: -8;
-  // }
 
   .nav-container {
     display: flex;
@@ -43,7 +32,6 @@ nav {
       }
       img {
         height: 3rem;
-        // width: 26px;
       }
     }
     

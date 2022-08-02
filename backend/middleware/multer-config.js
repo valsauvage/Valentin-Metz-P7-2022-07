@@ -12,10 +12,10 @@ const storage = multer.diskStorage({
       file.mimetype != "image/jpeg" &&
       file.mimetype != "image/png"
     )
-      return Error("invalid file");
-    // if (req.file.size > 500000) return Error("max size");
-    else callback(null, file.originalname);
+      req.error = Error("invalid file");
+    if (file.size > 500000) req.error = Error("max size");
+     callback(null, file.originalname);
   },
 });
 
-module.exports = multer({ storage: storage, limits: { fileSize: maxSize }}).single("file");
+module.exports = multer({ storage: storage }).single("file");
