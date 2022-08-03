@@ -5,8 +5,8 @@ const { signUpErrors } = require("../utils/errors.utils");
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
-const createToken = (id) => {
-  return jwt.sign({ id }, process.env.SECRET_KEY, {
+const createToken = (id, admin) => {
+  return jwt.sign({ id, admin }, process.env.SECRET_KEY, {
     expiresIn: maxAge,
   });
 };
@@ -26,14 +26,6 @@ module.exports.signUp = async (req, res) => {
         res.status(200).send({ errors });
       });
   });
-
-  // try {
-  //   const user = await UserModel.create({ pseudo, email, password });
-  //   res.status(201).json({ user: user._id });
-  // } catch (err) {
-  //   const errors = signUpErrors(err);
-  //   res.status(400).send({ errors });
-  // }
 };
 
 module.exports.signIn = async (req, res) => {
@@ -54,34 +46,21 @@ module.exports.signIn = async (req, res) => {
                 errors: { email: "", password: "Mot de pass incorrect" },
               });
             } else {
-              const token = createToken(user._id);
-              res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge });
-              res.status(200).json({
-                user: user._id,
-                token: token,
+              const token = createToken(user._id, user.admin);
+              res.cookie("jwt", token, {
+                withCredentials: true,
+                httpOnly: true,
+                maxAge: maxAge,
               });
+              res.status(200).json("Token créé");
             }
           })
           .catch((err) =>
-            res.status(500).json({ message: "erreur de cryptage " + error })
+            res.status(500).json({ message: "erreur de cryptage " + err })
           );
       }
     })
-    .catch((err) =>
-      res.status(500).json({ message: "erreur d'email " + error })
-    );
-
-  // const { email, password } = req.body;
-
-  // try {
-  //   const user = await UserModel.login(email, password);
-  //   const token = createToken(user._id);
-  //   res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge });
-  //   res.status(200).json({ user: user._id });
-  // } catch (err) {
-  //   const errors = signInErrors(err);
-  //   res.status(400).json({ errors });
-  // }
+    .catch((err) => res.status(500).json({ message: "erreur d'email " + err }));
 };
 
 module.exports.logout = (req, res) => {

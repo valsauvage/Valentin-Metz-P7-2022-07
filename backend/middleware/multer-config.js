@@ -1,7 +1,5 @@
 const multer = require("multer");
 
-const maxSize = 1000000;
-
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
     callback(null, "upload");
@@ -13,7 +11,7 @@ const storage = multer.diskStorage({
       file.mimetype != "image/png"
     )
       req.error = Error("invalid file");
-    if (file.size > 500000) req.error = Error("max size");
+    if (file.size > 5000000) req.error = Error("max size");
      callback(null, file.originalname);
   },
 });

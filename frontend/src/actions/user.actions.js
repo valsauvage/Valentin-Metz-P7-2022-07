@@ -9,7 +9,7 @@ export const GET_USER_ERRORS = "GET_USER_ERRORS";
 export const getUser = (uid) => {
   return (dispatch) => {
     return axios
-      .get(`${process.env.REACT_APP_API_URL}api/user/${uid}`)
+      .get(`${process.env.REACT_APP_API_URL}api/user/${uid}`, {withCredentials: true})
       .then((res) => {
         dispatch({ type: GET_USER, payload: res.data });
       })
@@ -20,14 +20,14 @@ export const getUser = (uid) => {
 export const uploadPicture = (data, id) => {
   return (dispatch) => {
     return axios
-      .post(`${process.env.REACT_APP_API_URL}api/user/upload`, data)
+      .post(`${process.env.REACT_APP_API_URL}api/user/upload`, data, {withCredentials: true})
       .then((res) => {
         if (res.data.errors) {
           dispatch({ type: GET_USER_ERRORS, payload: res.data.errors });
         } else {
           dispatch({ type: GET_USER_ERRORS, payload: "" });
           return axios
-            .get(`${process.env.REACT_APP_API_URL}api/user/${id}`)
+            .get(`${process.env.REACT_APP_API_URL}api/user/${id}`, {withCredentials: true})
             .then((res) => {
               dispatch({ type: UPLOAD_PICTURE, payload: res.data.picture });
             })
@@ -43,6 +43,7 @@ export const updateBio = (userId, bio) => {
       method: "put",
       url: `${process.env.REACT_APP_API_URL}api/user/` + userId,
       data: { bio },
+      withCredentials: true
     })
       .then((res) => {
         dispatch({ type: UPDATE_BIO, payload: bio });

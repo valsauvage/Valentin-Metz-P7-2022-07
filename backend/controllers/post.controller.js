@@ -4,19 +4,17 @@ const ObjectId = require("mongoose").Types.ObjectId;
 const { uploadErrors } = require("../utils/errors.utils");
 
 module.exports.readPost = (req, res) => {
-  PostModel
-    .find((err, docs) => {
-      if (!err) res.send(docs);
-      else console.log("Erreur de contenu : " + err);
-    })
-    .sort({ createdAt: -1 });
+  PostModel.find((err, docs) => {
+    if (!err) res.send(docs);
+    else console.log("Erreur de contenu : " + err);
+  }).sort({ createdAt: -1 });
 };
 
 module.exports.createPost = async (req, res) => {
   if (req.error) {
     const errors = uploadErrors(req.error);
     return res.status(201).json({ errors });
-   }
+  }
   const newPost = new PostModel({
     posterId: req.body.posterId,
     message: req.body.message,
@@ -40,27 +38,39 @@ module.exports.updatePost = (req, res) => {
   if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
-  const updatedRecord = {
-    message: req.body.message,
-  };
-  PostModel.findByIdAndUpdate(
-    req.params.id,
-    { $set: updatedRecord },
-    { new: true },
-    (err, docs) => {
-      if (!err) res.send(docs);
-      else console.log("Erreur de mise à jour : " + err);
+  PostModel.findById({ _id: req.params.id }).then((post) => {
+    if (post.posterId === req.auth.userId || req.auth.admin) {
+      const updatedRecord = {
+        message: req.body.message,
+      };
+      PostModel.findByIdAndUpdate(
+        req.params.id,
+        { $set: updatedRecord },
+        { new: true },
+        (err, docs) => {
+          if (!err) res.send(docs);
+          else console.log("Erreur de mise à jour : " + err);
+        }
+      );
+    } else {
+      res.status(401).send({ message: "Unauthorized" });
     }
-  );
+  });
 };
 
 module.exports.deletePost = (req, res) => {
   if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
-  PostModel.findByIdAndDelete(req.params.id, (err, docs) => {
-    if (!err) res.send(docs);
-    else console.log("Erreur de suppression : " + err);
+  PostModel.findById({ _id: req.params.id }).then((post) => {
+    if (post.posterId === req.auth.userId || req.auth.admin) {
+      PostModel.findByIdAndDelete(req.params.id, (err, docs) => {
+        if (!err) res.send(docs);
+        else console.log("Erreur de suppression : " + err);
+      });
+    } else {
+      res.status(401).send({ message: "Unauthorized" });
+    }
   });
 };
 
@@ -69,27 +79,24 @@ module.exports.likePost = async (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    await PostModel
-      .findByIdAndUpdate(
-        req.params.id,
-        {
-          $addToSet: { likers: req.body.id },
+    await PostModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $addToSet: { likers: req.body.id },
+      },
+      { new: true }
+    ).catch((err) => {
+      return res.status(400).send(err);
+    });
+    await UserModel.findByIdAndUpdate(
+      req.body.id,
+      {
+        $addToSet: {
+          likes: req.params.id,
         },
-        { new: true }
-      )
-      .catch((err) => {
-        return res.status(400).send(err);
-      });
-    await UserModel
-      .findByIdAndUpdate(
-        req.body.id,
-        {
-          $addToSet: {
-            likes: req.params.id,
-          },
-        },
-        { new: true }
-      )
+      },
+      { new: true }
+    )
       .then((docs) => {
         res.send(docs);
       })
@@ -106,27 +113,24 @@ module.exports.unLikePost = async (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    await PostModel
-      .findByIdAndUpdate(
-        req.params.id,
-        {
-          $pull: { likers: req.body.id },
+    await PostModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        $pull: { likers: req.body.id },
+      },
+      { new: true }
+    ).catch((err) => {
+      return res.status(400).send(err);
+    });
+    await UserModel.findByIdAndUpdate(
+      req.body.id,
+      {
+        $pull: {
+          likes: req.params.id,
         },
-        { new: true }
-      )
-      .catch((err) => {
-        return res.status(400).send(err);
-      });
-    await UserModel
-      .findByIdAndUpdate(
-        req.body.id,
-        {
-          $pull: {
-            likes: req.params.id,
-          },
-        },
-        { new: true }
-      )
+      },
+      { new: true }
+    )
       .then((docs) => {
         res.send(docs);
       })
